@@ -3,217 +3,430 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>VulnWire — security intel your agents can act on</title>
-<meta name="description" content="A vulnerability feed built for AI agents: webhook alerts, an MCP search server, security skills and plugin packs. Agents learn about a CVE and check their own servers in the same minute.">
+<title>VulnWire — security intel for AI agents</title>
+<meta name="description" content="A vulnerability feed built for agents: signed webhooks, an MCP search server, security skills and plugin packs. Agents learn about a CVE and verify their own servers in the same minute.">
 <style>
-  :root{
-    --bg:#08090c; --panel:#0e1116; --line:#1c212b; --ink:#e8ecf3; --dim:#8b95a7;
-    --acc:#4ade80; --acc2:#38bdf8; --warn:#fbbf24; --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
-  }
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-  a{color:inherit;text-decoration:none}
-  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
-  .nav{position:sticky;top:0;z-index:20;background:rgba(8,9,12,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-  .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
-  .brand{display:flex;align-items:center;gap:10px;font-weight:650;letter-spacing:-.02em}
-  .dot{width:9px;height:9px;border-radius:50%;background:var(--acc);box-shadow:0 0 12px var(--acc)}
-  .nav a.l{color:var(--dim);font-size:14px;margin-left:22px}
-  .nav a.l:hover{color:var(--ink)}
-  .btn{display:inline-block;border-radius:8px;padding:11px 18px;font-weight:620;font-size:14px;border:1px solid var(--line);background:#12161d;color:var(--ink);transition:.15s}
-  .btn:hover{border-color:#2b3342;transform:translateY(-1px)}
-  .btn.p{background:var(--acc);color:#04120a;border-color:var(--acc)}
-  .btn.p:hover{background:#5ee88f}
-  section{padding:88px 0;border-bottom:1px solid var(--line)}
-  h1{font-size:clamp(34px,5.4vw,60px);line-height:1.05;letter-spacing:-.035em;margin:0 0 20px;font-weight:700}
-  h2{font-size:clamp(24px,3.2vw,34px);letter-spacing:-.025em;margin:0 0 14px;font-weight:660}
-  h3{font-size:17px;margin:0 0 8px;font-weight:640}
-  p.lead{font-size:19px;color:var(--dim);max-width:640px}
-  .kicker{font:12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
-  .grid{display:grid;gap:16px}
-  .g2{grid-template-columns:repeat(2,1fr)}
-  .g3{grid-template-columns:repeat(3,1fr)}
-  .g4{grid-template-columns:repeat(4,1fr)}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px}
-  .card .ico{font:600 12px/1 var(--mono);color:var(--acc);letter-spacing:.1em;margin-bottom:14px}
-  .card p{margin:0;color:var(--dim);font-size:14.5px}
-  .hero{padding:96px 0 84px}
-  .hero .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
-  .note{font-size:13px;color:var(--dim);margin-top:14px}
-  pre{background:#0a0d12;border:1px solid var(--line);border-radius:12px;padding:20px;overflow:auto;font:13px/1.7 var(--mono);color:#c9d3e2;margin:0}
-  .k{color:var(--acc2)} .s{color:#a7f3d0} .c{color:#5b6577}
-  .step{position:relative;padding-left:44px}
-  .step .n{position:absolute;left:0;top:2px;width:26px;height:26px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font:12px var(--mono);color:var(--acc)}
-  .price{display:flex;flex-direction:column}
-  .price .amt{font-size:38px;font-weight:700;letter-spacing:-.03em;margin:6px 0 2px}
-  .price .amt span{font-size:14px;font-weight:500;color:var(--dim);letter-spacing:0}
-  .price ul{list-style:none;padding:0;margin:18px 0 22px;font-size:14px;color:var(--dim)}
-  .price li{padding:7px 0;border-top:1px solid #14181f}
-  .price li:before{content:"→ ";color:var(--acc)}
-  .price .btn{text-align:center;margin-top:auto}
-  .hl{border-color:#2a4a37;box-shadow:0 0 0 1px #1d3b2b inset}
-  .tag{font:11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:#04120a;background:var(--acc);border-radius:99px;padding:5px 9px;display:inline-block;margin-bottom:12px}
-  table{width:100%;border-collapse:collapse;font-size:14px}
-  th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line)}
-  th{color:var(--dim);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.06em}
-  .muted{color:var(--dim)}
-  footer{padding:44px 0;color:var(--dim);font-size:13.5px}
-  footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
-  @media(max-width:900px){.g3,.g4{grid-template-columns:1fr 1fr}}
-  @media(max-width:640px){.g2,.g3,.g4{grid-template-columns:1fr}.nav a.l{display:none}section{padding:64px 0}}
+:root{
+  --paper:#f7f6f2; --paper-2:#efeee8; --ink:#0d100e; --ink-2:#3d4540; --muted:#6c7570;
+  --line:#dfded6; --line-2:#e8e7e0; --green:#0f7a4f; --green-2:#12a066; --mint:#d9f2e4;
+  --card:#fffefb; --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+  --r:18px; --sh:0 1px 2px rgba(13,16,14,.04),0 8px 24px -12px rgba(13,16,14,.10);
+  --sh-h:0 2px 4px rgba(13,16,14,.05),0 22px 48px -20px rgba(13,16,14,.22);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.62 var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:var(--mint);color:var(--ink)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1140px;margin:0 auto;padding:0 28px}
+.mono{font-family:var(--mono)}
+#prog{position:fixed;top:0;left:0;height:2px;width:0;background:linear-gradient(90deg,var(--green),var(--green-2));z-index:60;transition:width .1s linear}
+.nav{position:sticky;top:0;z-index:50;background:rgba(247,246,242,.78);backdrop-filter:saturate(180%) blur(14px);border-bottom:1px solid transparent;transition:border-color .3s,background .3s}
+.nav.solid{border-color:var(--line);background:rgba(247,246,242,.92)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:66px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:640;letter-spacing:-.03em;font-size:17px}
+.mark{width:26px;height:26px;border-radius:8px;background:linear-gradient(150deg,#0d100e,#2a3b32);display:grid;place-items:center;position:relative;overflow:hidden}
+.mark:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 20%,rgba(18,160,102,.9),transparent 60%);opacity:.9}
+.mark span{position:relative;z-index:1;width:7px;height:7px;border-radius:50%;background:#d9f2e4;box-shadow:0 0 10px #12a066}
+.nav nav{display:flex;align-items:center;gap:4px}
+.nav nav a{font-size:14.5px;color:var(--ink-2);padding:9px 13px;border-radius:9px;transition:.18s}
+.nav nav a:hover{background:rgba(13,16,14,.05);color:var(--ink)}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:11px;padding:13px 20px;font-weight:600;font-size:14.5px;border:1px solid var(--line);background:var(--card);color:var(--ink);transition:transform .18s cubic-bezier(.2,.7,.3,1),box-shadow .18s,border-color .18s,background .18s}
+.btn:hover{transform:translateY(-1.5px);box-shadow:var(--sh);border-color:#cfcec4}
+.btn:active{transform:translateY(0)}
+.btn.primary{background:var(--ink);color:#f7f6f2;border-color:var(--ink)}
+.btn.primary:hover{background:#1a201c;box-shadow:0 14px 30px -14px rgba(13,16,14,.6)}
+.btn.ghost{background:transparent}
+.btn .arw{transition:transform .2s}
+.btn:hover .arw{transform:translateX(3px)}
+.hero{position:relative;padding:92px 0 40px;overflow:hidden}
+.mesh{position:absolute;inset:-20% -10% auto -10%;height:720px;pointer-events:none;z-index:0;background:radial-gradient(42% 48% at 18% 28%,rgba(18,160,102,.16),transparent 70%),radial-gradient(38% 44% at 78% 16%,rgba(56,189,248,.13),transparent 70%),radial-gradient(46% 50% at 58% 64%,rgba(180,83,9,.08),transparent 70%);filter:blur(18px);animation:drift 22s ease-in-out infinite alternate}
+@keyframes drift{0%{transform:translate3d(0,0,0) scale(1)}100%{transform:translate3d(-3%,2%,0) scale(1.06)}}
+.hero .wrap{position:relative;z-index:1}
+.hero-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:56px;align-items:center}
+.badge{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--line);background:rgba(255,254,251,.7);border-radius:99px;padding:7px 14px 7px 10px;font-size:12.5px;color:var(--ink-2);font-family:var(--mono);letter-spacing:.02em}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--green-2);position:relative}
+.pulse:after{content:"";position:absolute;inset:-4px;border-radius:50%;border:1px solid var(--green-2);animation:ripple 2s ease-out infinite}
+@keyframes ripple{0%{transform:scale(.7);opacity:.9}100%{transform:scale(2.1);opacity:0}}
+h1{font-size:clamp(38px,5.1vw,66px);line-height:1.02;letter-spacing:-.045em;margin:22px 0 20px;font-weight:680}
+h1 em{font-style:normal;color:var(--green);position:relative;white-space:nowrap}
+h1 em:after{content:"";position:absolute;left:0;right:0;bottom:.06em;height:.30em;background:var(--mint);z-index:-1;border-radius:3px;transform:scaleX(0);transform-origin:left;animation:swipe .9s .5s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes swipe{to{transform:scaleX(1)}}
+p.lead{font-size:18.5px;color:var(--ink-2);max-width:520px;margin:0 0 30px}
+.cta{display:flex;gap:11px;flex-wrap:wrap;align-items:center}
+.sub{font-size:13px;color:var(--muted);margin-top:16px;display:flex;gap:16px;flex-wrap:wrap}
+.sub span{display:inline-flex;align-items:center;gap:6px}
+.tick{color:var(--green)}
+.term{background:#0d100e;border-radius:20px;box-shadow:0 40px 80px -40px rgba(13,16,14,.55),0 0 0 1px rgba(255,255,255,.05) inset;overflow:hidden;transform:perspective(1200px) rotateY(-3deg) rotateX(2deg);transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.term:hover{transform:perspective(1200px) rotateY(0) rotateX(0)}
+.term-bar{display:flex;align-items:center;gap:7px;padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.07)}
+.term-bar i{width:9px;height:9px;border-radius:50%;background:#2c3531;display:block}
+.term-bar .t{margin-left:8px;font:11.5px var(--mono);color:#7d8983;letter-spacing:.04em}
+.term pre{margin:0;padding:20px 20px 22px;font:12.6px/1.85 var(--mono);color:#cfe0d6;overflow:auto;max-height:340px;white-space:pre}
+.term .k{color:#7fd1a8}.term .s{color:#e7d3a1}.term .v{color:#8fb8de}.term .c{color:#5a665f}
+.line{display:block;opacity:0;transform:translateY(4px);animation:lineIn .5s forwards}
+@keyframes lineIn{to{opacity:1;transform:none}}
+.term-foot{border-top:1px solid rgba(255,255,255,.07);padding:10px 16px;display:flex;justify-content:space-between;font:11.5px var(--mono);color:#5f6b64}
+.marq{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(255,255,255,.35);overflow:hidden;padding:16px 0;margin-top:54px}
+.marq-track{display:flex;gap:48px;width:max-content;animation:scroll 34s linear infinite}
+.marq:hover .marq-track{animation-play-state:paused}
+@keyframes scroll{to{transform:translateX(-50%)}}
+.marq span{font:12.5px var(--mono);color:var(--muted);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;display:flex;align-items:center;gap:10px}
+.marq span:before{content:"";width:5px;height:5px;border-radius:50%;background:var(--line);display:block}
+.marq span.on{color:var(--green)}
+.marq span.on:before{background:var(--green-2)}
+section{position:relative;padding:104px 0}
+.eyebrow{font:11.5px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--green);display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.eyebrow:before{content:"";width:22px;height:1px;background:var(--green);opacity:.5}
+h2{font-size:clamp(28px,3.5vw,42px);line-height:1.1;letter-spacing:-.035em;margin:0 0 16px;font-weight:660;max-width:720px}
+h3{font-size:16.5px;letter-spacing:-.01em;margin:0 0 7px;font-weight:640}
+p{color:var(--ink-2)}
+.lead-2{font-size:17.5px;color:var(--muted);max-width:640px;margin:0}
+.grid{display:grid;gap:16px}
+.g3{grid-template-columns:repeat(3,1fr)}
+.card{background:var(--card);border:1px solid var(--line-2);border-radius:var(--r);padding:26px;box-shadow:var(--sh);transition:transform .25s cubic-bezier(.2,.7,.3,1),box-shadow .25s,border-color .25s;position:relative;overflow:hidden}
+.card:hover{transform:translateY(-3px);box-shadow:var(--sh-h);border-color:#d2d1c7}
+.card .num{font:11.5px var(--mono);color:var(--green);letter-spacing:.1em;margin-bottom:16px;display:block}
+.card p{margin:0;font-size:14.6px;color:var(--muted);line-height:1.62}
+.card .ico{width:38px;height:38px;border-radius:11px;background:var(--paper-2);display:grid;place-items:center;margin-bottom:18px;border:1px solid var(--line-2);transition:.25s}
+.card:hover .ico{background:var(--mint);border-color:#c4e6d4}
+.card .ico svg{width:18px;height:18px;stroke:var(--green);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.steps{display:grid;gap:0;margin-top:44px;border-top:1px solid var(--line)}
+.step{display:grid;grid-template-columns:52px 1fr;gap:22px;padding:30px 0;border-bottom:1px solid var(--line);align-items:start}
+.step .n{font:13px var(--mono);color:var(--green);border:1px solid var(--line);background:var(--card);width:34px;height:34px;border-radius:10px;display:grid;place-items:center;transition:.25s}
+.step:hover .n{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.step h3{font-size:18px;margin-bottom:6px}
+.step p{margin:0;color:var(--muted);font-size:15px;max-width:620px}
+.prod{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+.prod .card{padding:28px}
+.prod .tag{font:10.5px var(--mono);letter-spacing:.12em;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:4px 9px;display:inline-block;margin-bottom:16px}
+.prod .card:hover .tag{color:var(--green);border-color:#c4e6d4;background:var(--mint)}
+.toggle{display:inline-flex;background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:4px;gap:2px;margin:26px 0 34px}
+.toggle button{border:0;background:transparent;font:600 13.5px var(--sans);color:var(--muted);padding:9px 18px;border-radius:9px;cursor:pointer;transition:.2s;font-family:var(--sans)}
+.toggle button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.toggle .save{font:10.5px var(--mono);color:var(--green);margin-left:6px}
+.tiers{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;align-items:stretch}
+.tier{background:var(--card);border:1px solid var(--line-2);border-radius:var(--r);padding:26px 22px;display:flex;flex-direction:column;box-shadow:var(--sh);transition:transform .25s,box-shadow .25s,border-color .25s;position:relative}
+.tier:hover{transform:translateY(-4px);box-shadow:var(--sh-h)}
+.tier.hi{border-color:#b9dcc8;background:linear-gradient(180deg,#fbfffd,#ffffff)}
+.tier.hi:before{content:"";position:absolute;inset:0;border-radius:var(--r);box-shadow:0 0 0 1px #b9dcc8 inset;pointer-events:none}
+.tier .badge-2{position:absolute;top:-11px;left:22px;background:var(--ink);color:var(--paper);font:10.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:5px 10px;border-radius:99px}
+.tier h3{font-size:15px;color:var(--ink);margin:0 0 4px}
+.tier .who{font-size:12.8px;color:var(--muted);min-height:34px;margin:0 0 14px}
+.price{font-size:38px;font-weight:680;letter-spacing:-.045em;line-height:1;display:flex;align-items:baseline;gap:3px}
+.price small{font-size:13px;font-weight:500;color:var(--muted);letter-spacing:0}
+.price .per{transition:opacity .2s}
+.tier ul{list-style:none;margin:20px 0 24px;padding:0;font-size:13.8px;color:var(--ink-2);flex:1}
+.tier li{padding:8px 0 8px 22px;border-top:1px solid var(--line-2);position:relative}
+.tier li:before{content:"";position:absolute;left:0;top:15px;width:9px;height:5px;border-left:1.6px solid var(--green);border-bottom:1.6px solid var(--green);transform:rotate(-45deg)}
+.tier .btn{width:100%;justify-content:center}
+details{border-bottom:1px solid var(--line);padding:22px 0}
+details summary{list-style:none;cursor:pointer;font-weight:600;font-size:16.5px;display:flex;justify-content:space-between;align-items:center;gap:20px;letter-spacing:-.01em}
+details summary::-webkit-details-marker{display:none}
+details summary .pl{width:22px;height:22px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;flex:0 0 auto;transition:.25s;color:var(--muted)}
+details[open] summary .pl{transform:rotate(45deg);background:var(--ink);color:var(--paper);border-color:var(--ink)}
+details p{margin:14px 0 0;color:var(--muted);font-size:15px;max-width:760px}
+.final{background:var(--ink);color:var(--paper);border-radius:26px;padding:64px 56px;text-align:center;position:relative;overflow:hidden}
+.final:before{content:"";position:absolute;inset:-40% -10% auto -10%;height:420px;background:radial-gradient(45% 60% at 50% 40%,rgba(18,160,102,.34),transparent 70%);filter:blur(10px)}
+.final h2{color:var(--paper);margin:0 auto 12px;position:relative}
+.final p{color:#a9b3ad;position:relative;margin:0 auto 28px;max-width:520px}
+.final .btn{position:relative;background:var(--paper);color:var(--ink);border-color:var(--paper)}
+.final .btn:hover{background:#fff}
+.final .price-tag{position:relative;font:12px var(--mono);color:#8fb8a4;letter-spacing:.08em;margin-top:18px}
+footer{padding:44px 0 56px}
+footer .wrap{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;font-size:13.5px;color:var(--muted)}
+footer .cols{display:flex;gap:30px;flex-wrap:wrap}
+footer a:hover{color:var(--ink)}
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.d1{transition-delay:.06s}.d2{transition-delay:.12s}.d3{transition-delay:.18s}.d4{transition-delay:.24s}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+@media(max-width:980px){
+  .hero-grid{grid-template-columns:1fr;gap:38px}
+  .term{transform:none}
+  .g3,.prod,.tiers{grid-template-columns:1fr 1fr}
+  .final{padding:48px 28px}
+}
+@media(max-width:640px){
+  section{padding:72px 0}
+  .hero{padding:64px 0 20px}
+  .g3,.prod,.tiers{grid-template-columns:1fr}
+  .nav nav a{display:none}
+  p.lead{font-size:17px}
+}
 </style>
 </head>
 <body>
+<div id="prog"></div>
 
-<nav class="nav"><div class="wrap">
-  <div class="brand"><span class="dot"></span>VulnWire</div>
-  <div>
-    <a class="l" href="#how">How it works</a>
-    <a class="l" href="#products">Products</a>
-    <a class="l" href="#pricing">Pricing</a>
-    <a class="l" href="#faq">FAQ</a>
-    <a class="btn p" href="#pricing" style="margin-left:22px">Start free</a>
-  </div>
-</div></nav>
+<header class="nav" id="nav"><div class="wrap">
+  <a class="brand" href="#top"><span class="mark"><span></span></span>VulnWire</a>
+  <nav>
+    <a href="#how">How it works</a>
+    <a href="#products">Products</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#faq">FAQ</a>
+    <a class="btn primary" href="#pricing" style="margin-left:8px">Start free <span class="arw">→</span></a>
+  </nav>
+</div></header>
 
-<!-- 1 HERO -->
-<section class="hero"><div class="wrap">
-  <div class="kicker">Feed for agents · not for humans</div>
-  <h1>The CVE hits the wire.<br>Your agent already checked the servers.</h1>
-  <p class="lead">VulnWire is a vulnerability feed built to be consumed by AI agents, not read by analysts. A webhook fires, the agent pulls the advisory, matches it against the stack it manages and reports back — in the same minute, with the package version it actually found.</p>
-  <div class="cta">
-    <a class="btn p" href="#pricing">Start at $9.90/mo</a>
-    <a class="btn" href="#products">See the products</a>
-  </div>
-  <p class="note">No dashboard to babysit. One endpoint, one MCP server, one skill pack.</p>
-</div></section>
+<section class="hero" id="top">
+  <div class="mesh"></div>
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <span class="badge"><span class="pulse"></span>FEED LIVE · 1.284 advisories this week</span>
+        <h1>The CVE drops.<br>Your agent <em>already checked</em> the servers.</h1>
+        <p class="lead">A vulnerability feed made for agents, not analysts. One signed webhook, one MCP server, one skill pack — so an agent learns what was published and verifies what it runs, in the same minute.</p>
+        <div class="cta">
+          <a class="btn primary" href="#pricing">Start at $9.90/mo <span class="arw">→</span></a>
+          <a class="btn ghost" href="#how">See how it works</a>
+        </div>
+        <div class="sub">
+          <span><span class="tick">✓</span> Signed payloads</span>
+          <span><span class="tick">✓</span> 7-day replay</span>
+          <span><span class="tick">✓</span> Cancel anytime</span>
+        </div>
+      </div>
 
-<!-- 2 PROBLEM -->
-<section><div class="wrap">
-  <div class="kicker">The gap</div>
-  <h2>Your agent is smart and uninformed.</h2>
-  <p class="lead" style="margin-bottom:34px">Agents are good at inspecting a host. They are bad at knowing what was published nine hours ago. Security news lives in feeds written for humans: prose, nested links, no machine-readable severity, no fixed schema.</p>
-  <div class="grid g3">
-    <div class="card"><div class="ico">01 / STALE</div><h3>Training cutoff</h3><p>The vulnerability was published after the model was trained. The agent will confidently say the stack is fine.</p></div>
-    <div class="card"><div class="ico">02 / NOISY</div><h3>Feeds built for reading</h3><p>RSS and newsletters assume a person will skim, judge and forward. Nothing an agent can act on safely.</p></div>
-    <div class="card"><div class="ico">03 / BLIND</div><h3>No verification loop</h3><p>Knowing a CVE exists is half the job. The other half is checking whether the package is installed, and at what version.</p></div>
-  </div>
-</div></section>
-
-<!-- 3 HOW IT WORKS -->
-<section id="how"><div class="wrap">
-  <div class="kicker">How it works</div>
-  <h2>Four steps, no human in the loop.</h2>
-  <div class="grid g2" style="margin-top:34px;align-items:start">
-    <div>
-      <div class="step" style="margin-bottom:26px"><span class="n">1</span><h3>Subscribe an endpoint</h3><p class="muted" style="margin:0">Point a webhook at your agent runtime. HMAC-signed payloads, retries with backoff, replay window of 7 days.</p></div>
-      <div class="step" style="margin-bottom:26px"><span class="n">2</span><h3>Receive a structured advisory</h3><p class="muted" style="margin:0">CVE, affected ranges, fixed versions, severity, exploitation status and the stack it touches — as JSON, not prose.</p></div>
-      <div class="step" style="margin-bottom:26px"><span class="n">3</span><h3>Agent inspects its own hosts</h3><p class="muted" style="margin:0">Using our MCP server or skill pack, the agent reads installed versions and decides what is actually exposed.</p></div>
-      <div class="step"><span class="n">4</span><h3>Report, patch, confirm</h3><p class="muted" style="margin:0">The agent replies with a finding per host. You get a decision, not a list of links.</p></div>
-    </div>
-    <div>
-<pre><span class="c">// POST to your endpoint</span>
+      <div class="term">
+        <div class="term-bar"><i></i><i></i><i></i><span class="t">POST /your-agent-endpoint</span></div>
+        <pre id="payload"><span class="c">// delivery #4821 · verified</span>
 {
   <span class="k">"event"</span>: <span class="s">"vulnerability.published"</span>,
   <span class="k">"cve"</span>: <span class="s">"CVE-2026-111497"</span>,
   <span class="k">"severity"</span>: <span class="s">"critical"</span>,
-  <span class="k">"cvss"</span>: 9.8,
-  <span class="k">"kev"</span>: <span class="k">true</span>,
-  <span class="k">"package"</span>: { <span class="k">"ecosystem"</span>: <span class="s">"pypi"</span>, <span class="k">"name"</span>: <span class="s">"brotli"</span> },
-  <span class="k">"affected"</span>: <span class="s">"&lt;1.2.1"</span>,
+  <span class="k">"cvss"</span>: <span class="v">9.8</span>,
+  <span class="k">"kev"</span>: <span class="v">true</span>,
+  <span class="k">"package"</span>: {
+    <span class="k">"ecosystem"</span>: <span class="s">"pypi"</span>,
+    <span class="k">"name"</span>: <span class="s">"brotli"</span>
+  },
+  <span class="k">"affected"</span>: <span class="s">"&lt; 1.2.1"</span>,
   <span class="k">"fixed"</span>: <span class="s">"1.2.1"</span>,
   <span class="k">"stack"</span>: [<span class="s">"python"</span>, <span class="s">"docker"</span>],
-  <span class="k">"published_at"</span>: <span class="s">"2026-10-27T14:02:00Z"</span>,
-  <span class="k">"signature"</span>: <span class="s">"sha256=..."</span>
+  <span class="k">"signature"</span>: <span class="s">"sha256=9f2c…"</span>
 }</pre>
+        <div class="term-foot"><span>HTTP 200 · 41ms</span><span>agent verified 3 hosts</span></div>
+      </div>
     </div>
-  </div>
-</div></section>
 
-<!-- 4 PRODUCTS -->
-<section id="products"><div class="wrap">
-  <div class="kicker">Products</div>
-  <h2>Six ways to plug it in.</h2>
-  <p class="lead" style="margin-bottom:34px">Each one works alone. Together they close the loop from publication to patched host.</p>
-  <div class="grid g3">
-    <div class="card"><div class="ico">WEBHOOK</div><h3>Vulnerability feed</h3><p>Real-time POST per advisory, filtered by ecosystem and stack. HMAC signature, idempotency key, 7-day replay. The core product — everything else sits on top of it.</p></div>
-    <div class="card"><div class="ico">MCP</div><h3>Vulnerability search</h3><p>An MCP server your agent calls with <code>search_vulns</code>, <code>get_advisory</code>, <code>check_package</code>. Answers with structured data and the fixed version, not a paragraph.</p></div>
-    <div class="card"><div class="ico">SKILLS</div><h3>Security skills</h3><p>Ready-made skills for agent runtimes: audit a host, match CVEs against installed packages, triage by exploitability, write the remediation plan.</p></div>
-    <div class="card"><div class="ico">PLUGINS</div><h3>Plugin pack</h3><p>Drop-in plugins for CI and container hosts: scan the image, compare against the live feed, fail the build above a severity threshold you set.</p></div>
-    <div class="card"><div class="ico">PENTEST</div><h3>Pentests</h3><p>Scoped engagement on the surface your agents operate, delivered with reproduction steps and a fix order. Human-led, agent-assisted.</p></div>
-    <div class="card"><div class="ico">REVIEW</div><h3>Code review</h3><p>Security review of the code paths that touch secrets, auth and money. Findings ranked by exploitability, with patch-level suggestions.</p></div>
+    <div class="marq">
+      <div class="marq-track">
+        <span>npm</span><span>PyPI</span><span>Go</span><span>Rust</span><span>Maven</span><span class="on">Docker</span><span>Debian</span><span>Ubuntu</span><span class="on">Alpine</span><span>CISA KEV</span>
+        <span>npm</span><span>PyPI</span><span>Go</span><span>Rust</span><span>Maven</span><span class="on">Docker</span><span>Debian</span><span>Ubuntu</span><span class="on">Alpine</span><span>CISA KEV</span>
+      </div>
+    </div>
   </div>
-</div></section>
+</section>
 
-<!-- 5 PRICING -->
-<section id="pricing"><div class="wrap">
-  <div class="kicker">Pricing</div>
-  <h2>Start at $9.90. Scale when it pays for itself.</h2>
-  <p class="lead" style="margin-bottom:34px">Every paid plan includes the webhook feed. Higher tiers add the MCP server, the skill pack and human work.</p>
-  <div class="grid g4">
-    <div class="card price">
-      <h3>Free</h3>
-      <div class="amt">$0</div>
-      <p class="muted" style="font-size:13px;margin:0">To test the payload shape</p>
-      <ul><li>1 webhook endpoint</li><li>Critical only</li><li>24h delayed</li><li>3 agent keys</li></ul>
-      <a class="btn" href="#faq">Get a key</a>
+<section>
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow">The gap</div>
+      <h2>Your agent is smart.<br>It is also uninformed.</h2>
+      <p class="lead-2">Agents inspect a host well. They cannot know what was published nine hours ago. Security news is written for humans: prose, nested links, no schema — nothing an agent can safely act on.</p>
     </div>
-    <div class="card price hl">
-      <span class="tag">Most chosen</span>
-      <h3>Starter</h3>
-      <div class="amt">$9.90<span>/mo</span></div>
-      <p class="muted" style="font-size:13px;margin:0">For one team, one stack</p>
-      <ul><li>Real-time webhook</li><li>All severities</li><li>10 agent keys</li><li>MCP read access</li><li>7-day replay</li></ul>
-      <a class="btn p" href="#faq">Subscribe</a>
-    </div>
-    <div class="card price">
-      <h3>Pro</h3>
-      <div class="amt">$49<span>/mo</span></div>
-      <p class="muted" style="font-size:13px;margin:0">For agents in production</p>
-      <ul><li>Unlimited keys</li><li>Skill pack included</li><li>Plugin pack included</li><li>Slack + Discord routing</li><li>Stack filters</li></ul>
-      <a class="btn" href="#faq">Subscribe</a>
-    </div>
-    <div class="card price">
-      <h3>Team</h3>
-      <div class="amt">$199<span>/mo</span></div>
-      <p class="muted" style="font-size:13px;margin:0">Agents plus humans</p>
-      <ul><li>Everything in Pro</li><li>4h response SLA</li><li>1 code review / mo</li><li>Private feed channel</li><li>Onboarding call</li></ul>
-      <a class="btn" href="#faq">Subscribe</a>
+    <div class="grid g3" style="margin-top:44px">
+      <div class="card reveal d1"><span class="num">01 / STALE</span><h3>Training cutoff</h3><p>The CVE was published after the model was trained. The agent will confidently report the stack is clean.</p></div>
+      <div class="card reveal d2"><span class="num">02 / NOISY</span><h3>Feeds built for reading</h3><p>Newsletters and RSS assume someone will skim, judge and forward. Nothing structured to act on.</p></div>
+      <div class="card reveal d3"><span class="num">03 / BLIND</span><h3>No verification loop</h3><p>Knowing a CVE exists is half the job. The other half is checking whether the package is installed, and at what version.</p></div>
     </div>
   </div>
+</section>
 
-  <div class="card" style="margin-top:18px;display:flex;justify-content:space-between;align-items:center;gap:22px;flex-wrap:wrap">
-    <div>
-      <h3 style="margin-bottom:4px">Enterprise</h3>
-      <p class="muted" style="margin:0">Pentest, continuous code review, private feed and a named engineer. Priced per engagement.</p>
+<section id="how" style="background:linear-gradient(180deg,rgba(255,255,255,.5),transparent 60%)">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow">How it works</div>
+      <h2>Four steps. No human in the loop.</h2>
     </div>
-    <a class="btn" href="#faq">Talk to us</a>
+    <div class="steps">
+      <div class="step reveal"><span class="n">01</span><div><h3>Subscribe an endpoint</h3><p>Point a webhook at your agent runtime. HMAC-SHA256 signature on every delivery, retries with backoff, 7-day replay window.</p></div></div>
+      <div class="step reveal"><span class="n">02</span><div><h3>Receive a structured advisory</h3><p>CVE, affected ranges, fixed version, severity, exploitation status and the ecosystems it touches — as JSON, not prose.</p></div></div>
+      <div class="step reveal"><span class="n">03</span><div><h3>The agent inspects its own hosts</h3><p>Through the MCP server or the skill pack, it reads installed versions and decides what is actually exposed.</p></div></div>
+      <div class="step reveal"><span class="n">04</span><div><h3>Report, patch, confirm</h3><p>You get one line per host with a decision attached, not a list of links to read.</p></div></div>
+    </div>
   </div>
-</div></section>
+</section>
 
-<!-- 6 FAQ / PROOF -->
-<section id="faq"><div class="wrap">
-  <div class="kicker">Questions</div>
-  <h2>What agents actually ask.</h2>
-  <div class="grid g2" style="margin-top:30px">
-    <div class="card"><h3>Does it replace my scanner?</h3><p>No. It replaces the part your scanner cannot do: knowing what was published in the last 72 hours and whether the package you run is on the list.</p></div>
-    <div class="card"><h3>What if the webhook fails?</h3><p>Retries with exponential backoff for 24h, replay window of 7 days, and a poll endpoint so the agent can catch up on what it missed.</p></div>
-    <div class="card"><h3>Which stacks are covered?</h3><p>npm, PyPI, Go, Rust, Maven, Docker images, plus OS packages from Debian and Ubuntu advisories. The payload carries the ecosystem, so the agent filters locally.</p></div>
-    <div class="card"><h3>Is the feed signed?</h3><p>Every delivery carries an HMAC-SHA256 signature over the raw body, with a rotating secret per endpoint. Reject anything that does not verify.</p></div>
+<section id="products">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow">Products</div>
+      <h2>Six ways to plug it in.</h2>
+      <p class="lead-2">Each works alone. Together they close the loop from publication to patched host.</p>
+    </div>
+    <div class="prod">
+      <div class="card reveal d1">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 12h4l3 7 3-14 3 7h3"/></svg></div>
+        <span class="tag">CORE</span>
+        <h3>Vulnerability webhook</h3>
+        <p>Real-time POST per advisory, filtered by ecosystem and stack. Signed, idempotent, replayable. Everything else sits on top of this.</p>
+      </div>
+      <div class="card reveal d2">
+        <div class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></div>
+        <span class="tag">MCP</span>
+        <h3>Vulnerability search</h3>
+        <p>An MCP server your agent calls with <span class="mono" style="font-size:13px">search_vulns</span>, <span class="mono" style="font-size:13px">get_advisory</span> and <span class="mono" style="font-size:13px">check_package</span>. Structured answers, fixed version included.</p>
+      </div>
+      <div class="card reveal d3">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l7 4v6c0 4-3 6.5-7 8-4-1.5-7-4-7-8V7z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg></div>
+        <span class="tag">SKILLS</span>
+        <h3>Security skills</h3>
+        <p>Ready-made skills: audit a host, match CVEs against installed packages, triage by exploitability, write the remediation plan.</p>
+      </div>
+      <div class="card reveal d1">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M10 3H5a2 2 0 0 0-2 2v5"/><path d="M14 21h5a2 2 0 0 0 2-2v-5"/><path d="M8 12h8"/><path d="M12 8v8"/></svg></div>
+        <span class="tag">PLUGINS</span>
+        <h3>Plugin pack</h3>
+        <p>Drop-in plugins for CI and container hosts: scan the image, compare against the live feed, fail the build above a threshold you set.</p>
+      </div>
+      <div class="card reveal d2">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 7V5h16v2"/><path d="M9 3h6"/><path d="M8 7v10a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V7"/><path d="M10 11v5M14 11v5"/></svg></div>
+        <span class="tag">HUMAN</span>
+        <h3>Pentests</h3>
+        <p>Scoped engagement on the surface your agents operate, delivered with reproduction steps and a fix order. Human-led, agent-assisted.</p>
+      </div>
+      <div class="card reveal d3">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M8 6l-5 6 5 6"/><path d="M16 6l5 6-5 6"/></svg></div>
+        <span class="tag">HUMAN</span>
+        <h3>Code review</h3>
+        <p>Security review of the paths that touch secrets, auth and money. Findings ranked by exploitability, with patch-level suggestions.</p>
+      </div>
+    </div>
   </div>
+</section>
 
-  <div class="card" style="margin-top:26px;text-align:center;padding:38px">
-    <h2 style="margin-bottom:8px">Nine ninety a month.</h2>
-    <p class="muted" style="margin:0 0 22px">Less than one hour of an analyst's time, for a feed that never sleeps.</p>
-    <a class="btn p" href="#pricing">Start with the $9.90 plan</a>
+<section id="pricing" style="background:linear-gradient(180deg,transparent,rgba(255,255,255,.6))">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow">Pricing</div>
+      <h2>Start at $9.90.<br>Scale when it pays for itself.</h2>
+      <div class="toggle" id="tg">
+        <button class="on" data-mode="m">Monthly</button>
+        <button data-mode="y">Yearly <span class="save">−20%</span></button>
+      </div>
+    </div>
+
+    <div class="tiers">
+      <div class="tier reveal d1">
+        <h3>Free</h3><p class="who">To test the payload shape</p>
+        <div class="price"><span class="per" data-m="0" data-y="0">$0</span></div>
+        <ul><li>1 webhook endpoint</li><li>Critical only</li><li>24h delayed</li><li>3 agent keys</li></ul>
+        <a class="btn" href="#faq">Get a key</a>
+      </div>
+      <div class="tier hi reveal d2">
+        <span class="badge-2">Most chosen</span>
+        <h3>Starter</h3><p class="who">One team, one stack</p>
+        <div class="price"><span class="per" data-m="9.90" data-y="7.90">$9.90</span><small>/mo</small></div>
+        <ul><li>Real-time webhook</li><li>All severities</li><li>10 agent keys</li><li>MCP read access</li><li>7-day replay</li></ul>
+        <a class="btn primary" href="#faq">Subscribe</a>
+      </div>
+      <div class="tier reveal d3">
+        <h3>Pro</h3><p class="who">Agents in production</p>
+        <div class="price"><span class="per" data-m="49" data-y="39">$49</span><small>/mo</small></div>
+        <ul><li>Unlimited keys</li><li>Skill pack included</li><li>Plugin pack included</li><li>Slack + Discord routing</li><li>Stack filters</li></ul>
+        <a class="btn" href="#faq">Subscribe</a>
+      </div>
+      <div class="tier reveal d4">
+        <h3>Team</h3><p class="who">Agents plus humans</p>
+        <div class="price"><span class="per" data-m="199" data-y="159">$199</span><small>/mo</small></div>
+        <ul><li>Everything in Pro</li><li>4h response SLA</li><li>1 code review / mo</li><li>Private feed channel</li><li>Onboarding call</li></ul>
+        <a class="btn" href="#faq">Subscribe</a>
+      </div>
+    </div>
+
+    <div class="card reveal" style="margin-top:16px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;padding:26px 28px">
+      <div>
+        <h3 style="margin-bottom:3px">Enterprise</h3>
+        <p style="margin:0;font-size:14.6px;color:var(--muted)">Pentest, continuous code review, private feed and a named engineer. Priced per engagement.</p>
+      </div>
+      <a class="btn" href="#faq">Talk to us <span class="arw">→</span></a>
+    </div>
   </div>
-</div></section>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow">Questions</div>
+      <h2>What agents actually ask.</h2>
+    </div>
+    <div style="margin-top:34px" class="reveal">
+      <details open><summary>Does it replace my scanner?<span class="pl">+</span></summary><p>No. It replaces the part a scanner cannot do: knowing what was published in the last 72 hours and whether the package you run is on the list.</p></details>
+      <details><summary>What if the webhook fails?<span class="pl">+</span></summary><p>Retries with exponential backoff for 24h, a 7-day replay window, and a poll endpoint so the agent can catch up on whatever it missed.</p></details>
+      <details><summary>Which stacks are covered?<span class="pl">+</span></summary><p>npm, PyPI, Go, Rust, Maven, Docker images, plus OS packages from Debian, Ubuntu and Alpine advisories. The payload carries the ecosystem, so the agent filters locally.</p></details>
+      <details><summary>Is the feed signed?<span class="pl">+</span></summary><p>Every delivery carries an HMAC-SHA256 signature over the raw body, with a rotating secret per endpoint. Reject anything that does not verify.</p></details>
+      <details><summary>Can I cancel anytime?<span class="pl">+</span></summary><p>Yes. Monthly plans cancel from the dashboard; yearly plans can be cancelled and stay active until the end of the period.</p></details>
+    </div>
+
+    <div class="final reveal" style="margin-top:64px">
+      <h2>Nine ninety a month.</h2>
+      <p>Less than one hour of an analyst's time, for a feed that never sleeps and an agent that never forgets to check.</p>
+      <a class="btn" href="#pricing">Start with the $9.90 plan <span class="arw">→</span></a>
+      <div class="price-tag">NO CARD FOR THE FREE TIER · CANCEL ANYTIME</div>
+    </div>
+  </div>
+</section>
 
 <footer><div class="wrap">
-  <div>VulnWire — security intel for autonomous agents.</div>
-  <div class="muted">Feed · MCP · Skills · Plugins · Pentests · Code review</div>
+  <div>
+    <div class="brand" style="font-size:15px;margin-bottom:10px"><span class="mark" style="width:22px;height:22px;border-radius:7px"><span></span></span>VulnWire</div>
+    <div>Security intel for autonomous agents.</div>
+  </div>
+  <div class="cols">
+    <a href="#products">Feed</a><a href="#products">MCP</a><a href="#products">Skills</a><a href="#products">Plugins</a><a href="#products">Pentests</a><a href="#products">Code review</a>
+  </div>
 </div></footer>
 
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var prog = document.getElementById('prog'), nav = document.getElementById('nav');
+  function onScroll(){
+    var h = document.documentElement;
+    var p = h.scrollTop / (h.scrollHeight - h.clientHeight || 1);
+    prog.style.width = (p*100).toFixed(2) + '%';
+    nav.classList.toggle('solid', h.scrollTop > 8);
+  }
+  document.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+
+  var els = document.querySelectorAll('.reveal');
+  if(reduce || !('IntersectionObserver' in window)){
+    els.forEach(function(e){ e.classList.add('in'); });
+  } else {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); }
+      });
+    }, {threshold:.14, rootMargin:'0px 0px -60px 0px'});
+    els.forEach(function(e){ io.observe(e); });
+  }
+
+  var tg = document.getElementById('tg');
+  if(tg){
+    tg.addEventListener('click', function(ev){
+      var b = ev.target.closest('button'); if(!b) return;
+      tg.querySelectorAll('button').forEach(function(x){ x.classList.toggle('on', x === b); });
+      var yearly = b.dataset.mode === 'y';
+      document.querySelectorAll('.per').forEach(function(el){
+        var v = yearly ? el.dataset.y : el.dataset.m;
+        el.style.opacity = 0;
+        setTimeout(function(){ el.textContent = '$' + v; el.style.opacity = 1; }, 120);
+      });
+    });
+  }
+
+  var pre = document.getElementById('payload');
+  if(pre && !reduce){
+    var html = pre.innerHTML.split('\n').map(function(l,i){
+      return '<span class="line" style="animation-delay:' + (120 + i*55) + 'ms">' + (l || ' ') + '</span>';
+    }).join('');
+    pre.innerHTML = html;
+  }
+})();
+</script>
 </body>
 </html>
