@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VulnWire — security intel your agents can act on</title>
+<meta name="description" content="A vulnerability feed built for AI agents: webhook alerts, an MCP search server, security skills and plugin packs. Agents learn about a CVE and check their own servers in the same minute.">
+<style>
+  :root{
+    --bg:#08090c; --panel:#0e1116; --line:#1c212b; --ink:#e8ecf3; --dim:#8b95a7;
+    --acc:#4ade80; --acc2:#38bdf8; --warn:#fbbf24; --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  .nav{position:sticky;top:0;z-index:20;background:rgba(8,9,12,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:650;letter-spacing:-.02em}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--acc);box-shadow:0 0 12px var(--acc)}
+  .nav a.l{color:var(--dim);font-size:14px;margin-left:22px}
+  .nav a.l:hover{color:var(--ink)}
+  .btn{display:inline-block;border-radius:8px;padding:11px 18px;font-weight:620;font-size:14px;border:1px solid var(--line);background:#12161d;color:var(--ink);transition:.15s}
+  .btn:hover{border-color:#2b3342;transform:translateY(-1px)}
+  .btn.p{background:var(--acc);color:#04120a;border-color:var(--acc)}
+  .btn.p:hover{background:#5ee88f}
+  section{padding:88px 0;border-bottom:1px solid var(--line)}
+  h1{font-size:clamp(34px,5.4vw,60px);line-height:1.05;letter-spacing:-.035em;margin:0 0 20px;font-weight:700}
+  h2{font-size:clamp(24px,3.2vw,34px);letter-spacing:-.025em;margin:0 0 14px;font-weight:660}
+  h3{font-size:17px;margin:0 0 8px;font-weight:640}
+  p.lead{font-size:19px;color:var(--dim);max-width:640px}
+  .kicker{font:12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
+  .grid{display:grid;gap:16px}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px}
+  .card .ico{font:600 12px/1 var(--mono);color:var(--acc);letter-spacing:.1em;margin-bottom:14px}
+  .card p{margin:0;color:var(--dim);font-size:14.5px}
+  .hero{padding:96px 0 84px}
+  .hero .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+  .note{font-size:13px;color:var(--dim);margin-top:14px}
+  pre{background:#0a0d12;border:1px solid var(--line);border-radius:12px;padding:20px;overflow:auto;font:13px/1.7 var(--mono);color:#c9d3e2;margin:0}
+  .k{color:var(--acc2)} .s{color:#a7f3d0} .c{color:#5b6577}
+  .step{position:relative;padding-left:44px}
+  .step .n{position:absolute;left:0;top:2px;width:26px;height:26px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font:12px var(--mono);color:var(--acc)}
+  .price{display:flex;flex-direction:column}
+  .price .amt{font-size:38px;font-weight:700;letter-spacing:-.03em;margin:6px 0 2px}
+  .price .amt span{font-size:14px;font-weight:500;color:var(--dim);letter-spacing:0}
+  .price ul{list-style:none;padding:0;margin:18px 0 22px;font-size:14px;color:var(--dim)}
+  .price li{padding:7px 0;border-top:1px solid #14181f}
+  .price li:before{content:"→ ";color:var(--acc)}
+  .price .btn{text-align:center;margin-top:auto}
+  .hl{border-color:#2a4a37;box-shadow:0 0 0 1px #1d3b2b inset}
+  .tag{font:11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:#04120a;background:var(--acc);border-radius:99px;padding:5px 9px;display:inline-block;margin-bottom:12px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line)}
+  th{color:var(--dim);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.06em}
+  .muted{color:var(--dim)}
+  footer{padding:44px 0;color:var(--dim);font-size:13.5px}
+  footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+  @media(max-width:900px){.g3,.g4{grid-template-columns:1fr 1fr}}
+  @media(max-width:640px){.g2,.g3,.g4{grid-template-columns:1fr}.nav a.l{display:none}section{padding:64px 0}}
+</style>
+</head>
+<body>
+
+<nav class="nav"><div class="wrap">
+  <div class="brand"><span class="dot"></span>VulnWire</div>
+  <div>
+    <a class="l" href="#how">How it works</a>
+    <a class="l" href="#products">Products</a>
+    <a class="l" href="#pricing">Pricing</a>
+    <a class="l" href="#faq">FAQ</a>
+    <a class="btn p" href="#pricing" style="margin-left:22px">Start free</a>
+  </div>
+</div></nav>
+
+<!-- 1 HERO -->
+<section class="hero"><div class="wrap">
+  <div class="kicker">Feed for agents · not for humans</div>
+  <h1>The CVE hits the wire.<br>Your agent already checked the servers.</h1>
+  <p class="lead">VulnWire is a vulnerability feed built to be consumed by AI agents, not read by analysts. A webhook fires, the agent pulls the advisory, matches it against the stack it manages and reports back — in the same minute, with the package version it actually found.</p>
+  <div class="cta">
+    <a class="btn p" href="#pricing">Start at $9.90/mo</a>
+    <a class="btn" href="#products">See the products</a>
+  </div>
+  <p class="note">No dashboard to babysit. One endpoint, one MCP server, one skill pack.</p>
+</div></section>
+
+<!-- 2 PROBLEM -->
+<section><div class="wrap">
+  <div class="kicker">The gap</div>
+  <h2>Your agent is smart and uninformed.</h2>
+  <p class="lead" style="margin-bottom:34px">Agents are good at inspecting a host. They are bad at knowing what was published nine hours ago. Security news lives in feeds written for humans: prose, nested links, no machine-readable severity, no fixed schema.</p>
+  <div class="grid g3">
+    <div class="card"><div class="ico">01 / STALE</div><h3>Training cutoff</h3><p>The vulnerability was published after the model was trained. The agent will confidently say the stack is fine.</p></div>
+    <div class="card"><div class="ico">02 / NOISY</div><h3>Feeds built for reading</h3><p>RSS and newsletters assume a person will skim, judge and forward. Nothing an agent can act on safely.</p></div>
+    <div class="card"><div class="ico">03 / BLIND</div><h3>No verification loop</h3><p>Knowing a CVE exists is half the job. The other half is checking whether the package is installed, and at what version.</p></div>
+  </div>
+</div></section>
+
+<!-- 3 HOW IT WORKS -->
+<section id="how"><div class="wrap">
+  <div class="kicker">How it works</div>
+  <h2>Four steps, no human in the loop.</h2>
+  <div class="grid g2" style="margin-top:34px;align-items:start">
+    <div>
+      <div class="step" style="margin-bottom:26px"><span class="n">1</span><h3>Subscribe an endpoint</h3><p class="muted" style="margin:0">Point a webhook at your agent runtime. HMAC-signed payloads, retries with backoff, replay window of 7 days.</p></div>
+      <div class="step" style="margin-bottom:26px"><span class="n">2</span><h3>Receive a structured advisory</h3><p class="muted" style="margin:0">CVE, affected ranges, fixed versions, severity, exploitation status and the stack it touches — as JSON, not prose.</p></div>
+      <div class="step" style="margin-bottom:26px"><span class="n">3</span><h3>Agent inspects its own hosts</h3><p class="muted" style="margin:0">Using our MCP server or skill pack, the agent reads installed versions and decides what is actually exposed.</p></div>
+      <div class="step"><span class="n">4</span><h3>Report, patch, confirm</h3><p class="muted" style="margin:0">The agent replies with a finding per host. You get a decision, not a list of links.</p></div>
+    </div>
+    <div>
+<pre><span class="c">// POST to your endpoint</span>
+{
+  <span class="k">"event"</span>: <span class="s">"vulnerability.published"</span>,
+  <span class="k">"cve"</span>: <span class="s">"CVE-2026-111497"</span>,
+  <span class="k">"severity"</span>: <span class="s">"critical"</span>,
+  <span class="k">"cvss"</span>: 9.8,
+  <span class="k">"kev"</span>: <span class="k">true</span>,
+  <span class="k">"package"</span>: { <span class="k">"ecosystem"</span>: <span class="s">"pypi"</span>, <span class="k">"name"</span>: <span class="s">"brotli"</span> },
+  <span class="k">"affected"</span>: <span class="s">"&lt;1.2.1"</span>,
+  <span class="k">"fixed"</span>: <span class="s">"1.2.1"</span>,
+  <span class="k">"stack"</span>: [<span class="s">"python"</span>, <span class="s">"docker"</span>],
+  <span class="k">"published_at"</span>: <span class="s">"2026-10-27T14:02:00Z"</span>,
+  <span class="k">"signature"</span>: <span class="s">"sha256=..."</span>
+}</pre>
+    </div>
+  </div>
+</div></section>
+
+<!-- 4 PRODUCTS -->
+<section id="products"><div class="wrap">
+  <div class="kicker">Products</div>
+  <h2>Six ways to plug it in.</h2>
+  <p class="lead" style="margin-bottom:34px">Each one works alone. Together they close the loop from publication to patched host.</p>
+  <div class="grid g3">
+    <div class="card"><div class="ico">WEBHOOK</div><h3>Vulnerability feed</h3><p>Real-time POST per advisory, filtered by ecosystem and stack. HMAC signature, idempotency key, 7-day replay. The core product — everything else sits on top of it.</p></div>
+    <div class="card"><div class="ico">MCP</div><h3>Vulnerability search</h3><p>An MCP server your agent calls with <code>search_vulns</code>, <code>get_advisory</code>, <code>check_package</code>. Answers with structured data and the fixed version, not a paragraph.</p></div>
+    <div class="card"><div class="ico">SKILLS</div><h3>Security skills</h3><p>Ready-made skills for agent runtimes: audit a host, match CVEs against installed packages, triage by exploitability, write the remediation plan.</p></div>
+    <div class="card"><div class="ico">PLUGINS</div><h3>Plugin pack</h3><p>Drop-in plugins for CI and container hosts: scan the image, compare against the live feed, fail the build above a severity threshold you set.</p></div>
+    <div class="card"><div class="ico">PENTEST</div><h3>Pentests</h3><p>Scoped engagement on the surface your agents operate, delivered with reproduction steps and a fix order. Human-led, agent-assisted.</p></div>
+    <div class="card"><div class="ico">REVIEW</div><h3>Code review</h3><p>Security review of the code paths that touch secrets, auth and money. Findings ranked by exploitability, with patch-level suggestions.</p></div>
+  </div>
+</div></section>
+
+<!-- 5 PRICING -->
+<section id="pricing"><div class="wrap">
+  <div class="kicker">Pricing</div>
+  <h2>Start at $9.90. Scale when it pays for itself.</h2>
+  <p class="lead" style="margin-bottom:34px">Every paid plan includes the webhook feed. Higher tiers add the MCP server, the skill pack and human work.</p>
+  <div class="grid g4">
+    <div class="card price">
+      <h3>Free</h3>
+      <div class="amt">$0</div>
+      <p class="muted" style="font-size:13px;margin:0">To test the payload shape</p>
+      <ul><li>1 webhook endpoint</li><li>Critical only</li><li>24h delayed</li><li>3 agent keys</li></ul>
+      <a class="btn" href="#faq">Get a key</a>
+    </div>
+    <div class="card price hl">
+      <span class="tag">Most chosen</span>
+      <h3>Starter</h3>
+      <div class="amt">$9.90<span>/mo</span></div>
+      <p class="muted" style="font-size:13px;margin:0">For one team, one stack</p>
+      <ul><li>Real-time webhook</li><li>All severities</li><li>10 agent keys</li><li>MCP read access</li><li>7-day replay</li></ul>
+      <a class="btn p" href="#faq">Subscribe</a>
+    </div>
+    <div class="card price">
+      <h3>Pro</h3>
+      <div class="amt">$49<span>/mo</span></div>
+      <p class="muted" style="font-size:13px;margin:0">For agents in production</p>
+      <ul><li>Unlimited keys</li><li>Skill pack included</li><li>Plugin pack included</li><li>Slack + Discord routing</li><li>Stack filters</li></ul>
+      <a class="btn" href="#faq">Subscribe</a>
+    </div>
+    <div class="card price">
+      <h3>Team</h3>
+      <div class="amt">$199<span>/mo</span></div>
+      <p class="muted" style="font-size:13px;margin:0">Agents plus humans</p>
+      <ul><li>Everything in Pro</li><li>4h response SLA</li><li>1 code review / mo</li><li>Private feed channel</li><li>Onboarding call</li></ul>
+      <a class="btn" href="#faq">Subscribe</a>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px;display:flex;justify-content:space-between;align-items:center;gap:22px;flex-wrap:wrap">
+    <div>
+      <h3 style="margin-bottom:4px">Enterprise</h3>
+      <p class="muted" style="margin:0">Pentest, continuous code review, private feed and a named engineer. Priced per engagement.</p>
+    </div>
+    <a class="btn" href="#faq">Talk to us</a>
+  </div>
+</div></section>
+
+<!-- 6 FAQ / PROOF -->
+<section id="faq"><div class="wrap">
+  <div class="kicker">Questions</div>
+  <h2>What agents actually ask.</h2>
+  <div class="grid g2" style="margin-top:30px">
+    <div class="card"><h3>Does it replace my scanner?</h3><p>No. It replaces the part your scanner cannot do: knowing what was published in the last 72 hours and whether the package you run is on the list.</p></div>
+    <div class="card"><h3>What if the webhook fails?</h3><p>Retries with exponential backoff for 24h, replay window of 7 days, and a poll endpoint so the agent can catch up on what it missed.</p></div>
+    <div class="card"><h3>Which stacks are covered?</h3><p>npm, PyPI, Go, Rust, Maven, Docker images, plus OS packages from Debian and Ubuntu advisories. The payload carries the ecosystem, so the agent filters locally.</p></div>
+    <div class="card"><h3>Is the feed signed?</h3><p>Every delivery carries an HMAC-SHA256 signature over the raw body, with a rotating secret per endpoint. Reject anything that does not verify.</p></div>
+  </div>
+
+  <div class="card" style="margin-top:26px;text-align:center;padding:38px">
+    <h2 style="margin-bottom:8px">Nine ninety a month.</h2>
+    <p class="muted" style="margin:0 0 22px">Less than one hour of an analyst's time, for a feed that never sleeps.</p>
+    <a class="btn p" href="#pricing">Start with the $9.90 plan</a>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <div>VulnWire — security intel for autonomous agents.</div>
+  <div class="muted">Feed · MCP · Skills · Plugins · Pentests · Code review</div>
+</div></footer>
+
+</body>
+</html>
